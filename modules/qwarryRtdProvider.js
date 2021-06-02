@@ -45,15 +45,18 @@ function alterBidRequests(reqBidsConfigObj, callback, config, userConsent) {
   console.log('url : ', actualUrl);
   // const url = 'https://kvt.' + sirdataDomain + '/api/v1/public/p/' + moduleConfig.params.partnerId + '/d/' + moduleConfig.params.key + '/s?callback=&gdpr=' + gdprApplies + '&gdpr_consent=' + tcString + (actualUrl ? '&url=' + actualUrl : '');
 
-  ajax('google.fr', {
+  ajax('https://api.semantic.qwarry.co/oauth2/token', {
     success: function (response, req) {
       if (req.status === 200) {
         try {
           const data = JSON.parse(response);
+          console.log('data : ', data);
+
           if (data && data) {
-            console.log(data);
+            console.log('data : ', data);
             // addSegmentData(adUnits, data, moduleConfig, onDone);
           } else {
+            console.log('else ...');
             // onDone();
           }
         } catch (e) {
@@ -71,16 +74,18 @@ function alterBidRequests(reqBidsConfigObj, callback, config, userConsent) {
   },
   null,
   {
-    contentType: 'text/plain',
+    contentType: 'multipart/form-data',
     method: 'GET',
     withCredentials: true,
-    referrerPolicy: 'unsafe-url',
+    // referrerPolicy: 'unsafe-url',
     crossOrigin: true,
-    customHeaders: [{
-      grant_type: 'client_credentials',
-      CLIENT_ID: 'Aw5Gvx7Sxdnijdim2f3cIHOtregFlW3szUnQZVak',
-      CLIENT_SECRET: 'eIXBYpMDPORyNEMfSeblUo7eccNsoVOUKULjInkwBJyKkXuWC0Ewv8xUutVrbfMx8JBSjfaQQlpiLbdRnxH1JOc9BFG7TsPZfyLhINSj2t7UaVAizN8IdOOAr2OJm1oZ',
-    }]
+    customHeaders: {
+      'grant_type': 'client_credentials',
+      'CLIENT_ID': 'Aw5Gvx7Sxdnijdim2f3cIHOtregFlW3szUnQZVak',
+      'CLIENT_SECRET': 'eIXBYpMDPORyNEMfSeblUo7eccNsoVOUKULjInkwBJyKkXuWC0Ewv8xUutVrbfMx8JBSjfaQQlpiLbdRnxH1JOc9BFG7TsPZfyLhINSj2t7UaVAizN8IdOOAr2OJm1oZ',
+      'x-api-key': 'Pk1pspXJTL7851hKfAtR2aB7dJvL2S525JJkwbzU',
+      'Connection': 'keep-alive',
+    }
   });
 
   // ajax('google.fr', {
