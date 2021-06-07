@@ -81,9 +81,6 @@ function alterBidRequests(reqBidsConfigObj, callback, config, userConsent) {
     crossOrigin: true,
     customHeaders: {
       'grant_type': 'client_credentials',
-      'CLIENT_ID': 'Aw5Gvx7Sxdnijdim2f3cIHOtregFlW3szUnQZVak',
-      'CLIENT_SECRET': 'eIXBYpMDPORyNEMfSeblUo7eccNsoVOUKULjInkwBJyKkXuWC0Ewv8xUutVrbfMx8JBSjfaQQlpiLbdRnxH1JOc9BFG7TsPZfyLhINSj2t7UaVAizN8IdOOAr2OJm1oZ',
-      'x-api-key': 'Pk1pspXJTL7851hKfAtR2aB7dJvL2S525JJkwbzU',
       'Connection': 'keep-alive',
     }
   });
