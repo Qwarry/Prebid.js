@@ -5,6 +5,7 @@ import { ajax } from '../src/ajax.js';
 // import findIndex from 'core-js-pure/features/array/find-index.js';
 import { getRefererInfo } from '../src/refererDetection.js';
 // import { config } from '../src/config.js';
+import credentials from '../cred.json';
 
 const MODULE_NAME = 'realTimeData';
 const SUBMODULE_NAME = 'QwarryRTDModule';
@@ -45,6 +46,7 @@ function alterBidRequests(reqBidsConfigObj, callback, config, userConsent) {
   console.log('url : ', actualUrl);
   // const url = 'https://kvt.' + sirdataDomain + '/api/v1/public/p/' + moduleConfig.params.partnerId + '/d/' + moduleConfig.params.key + '/s?callback=&gdpr=' + gdprApplies + '&gdpr_consent=' + tcString + (actualUrl ? '&url=' + actualUrl : '');
 
+  console.log('credentials : ', credentials);
   ajax('https://api.semantic.qwarry.co/oauth2/token', {
     success: function (response, req) {
       if (req.status === 200) {
