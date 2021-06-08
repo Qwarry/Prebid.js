@@ -44,7 +44,6 @@ function alterBidRequests(reqBidsConfigObj, callback, config, userConsent) {
   var actualUrl = config.params.actualUrl || getRefererInfo().referer;
 
   console.log('url : ', actualUrl);
-  // const url = 'https://kvt.' + sirdataDomain + '/api/v1/public/p/' + moduleConfig.params.partnerId + '/d/' + moduleConfig.params.key + '/s?callback=&gdpr=' + gdprApplies + '&gdpr_consent=' + tcString + (actualUrl ? '&url=' + actualUrl : '');
 
   console.log('credentials : ', credentials);
   ajax('https://api.semantic.qwarry.co/oauth2/token', {
@@ -52,8 +51,6 @@ function alterBidRequests(reqBidsConfigObj, callback, config, userConsent) {
       if (req.status === 200) {
         try {
           const data = JSON.parse(response);
-          console.log('data : ', data);
-
           if (data && data) {
             console.log('data : ', data);
             // addSegmentData(adUnits, data, moduleConfig, onDone);
@@ -77,53 +74,72 @@ function alterBidRequests(reqBidsConfigObj, callback, config, userConsent) {
   null,
   {
     contentType: 'multipart/form-data',
-    method: 'GET',
+    method: 'POST',
     withCredentials: true,
-    // referrerPolicy: 'unsafe-url',
+    referrerPolicy: 'unsafe-url',
     crossOrigin: true,
     customHeaders: {
       'grant_type': 'client_credentials',
       'Connection': 'keep-alive',
+      'CLIENT_ID': credentials.CLIENT_ID,
+      'CLIENT_SECRET': credentials.CLIENT_SECRET,
+      'x-api-key': credentials.api_key
     }
   });
 
-  // ajax('google.fr', {
-  //   success: function (response, req) {
-  //     if (req.status === 200) {
-  //       try {
-  //         const data = JSON.parse(response);
-  //         if (data && data) {
-
-  //           // addSegmentData(adUnits, data, moduleConfig, onDone);
-  //         } else {
-  //           // onDone();
-  //         }
-  //       } catch (e) {
-  //         // onDone();
-  //         utils.logError('unable to parse Qwarry data' + e);
-  //       }
-  //     } else if (req.status === 204) {
-  //       // onDone();
-  //     }
-  //   },
-  //   error: function () {
-  //     // onDone();
-  //     utils.logError('unable to get Sirdata data');
-  //   }
-  // },
-  // null,
-  // {
-  //   contentType: 'text/plain',
-  //   method: 'GET',
-  //   // withCredentials: sendWithCredentials,
-  //   referrerPolicy: 'unsafe-url',
-  //   crossOrigin: true
-  // });
+  ajax(`https://api.semantic.qwarry.co/semantic?url=${encodeURIComponent(actualUrl)}`, {
+    success: function (response, req) {
+      if (req.status === 200) {
+        try {
+          const data = JSON.parse(response);
+          if (data && data) {
+            console.log('data : ', data);
+            // addSegmentData(adUnits, data, moduleConfig, onDone);
+          } else {
+            console.log('else ...');
+            // onDone();
+          }
+        } catch (e) {
+          // onDone();
+          utils.logError('unable to parse Qwarry data' + e);
+        }
+      } else if (req.status === 204) {
+        // onDone();
+      }
+    },
+    error: function () {
+      // onDone();
+      utils.logError('unable to get url scoring');
+    }
+  },
+  null,
+  {
+    method: 'GET',
+    withCredentials: true,
+    referrerPolicy: 'unsafe-url',
+    crossOrigin: true,
+    customHeaders: {
+      'grant_type': 'client_credentials',
+      'Connection': 'keep-alive',
+      'Authorization': `Bearer ${credentials.TOKEN}`,
+      'x-api-key': credentials.api_key
+    }
+  });
 
   adUnits.forEach(adUnit => {
     console.log(utils.deepAccess(adUnit, 'ortb2Imp.ext.data.sd_rtd'));
     if (!utils.deepAccess(adUnit, 'ortb2Imp.ext.data.sd_rtd')) {
-      utils.deepSetValue(adUnit, 'ortb2Imp.ext.data.sd_rtd', ['hello', 'baloo']);
+      utils.deepSetValue(adUnit, 'ortb2Imp.ext.data.sd_rtd', [
+        // put the data here !!!!
+        {
+          'young_mid': 647,
+          '28-02': 453,
+          'male': 532,
+          '31-10': 515,
+          '20-05': 310,
+          '31-07': 337
+        }
+      ]);
     }
   });
 
