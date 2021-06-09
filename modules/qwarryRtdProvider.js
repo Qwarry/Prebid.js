@@ -87,9 +87,8 @@ function alterBidRequests(reqBidsConfigObj, callback, config, userConsent) {
 
 export function addData(adUnits, data, moduleConfig, callback) {
   adUnits.forEach(adUnit => {
-    console.log(utils.deepAccess(adUnit, 'ortb2Imp.ext.data.sd_rtd'));
-    if (!utils.deepAccess(adUnit, 'ortb2Imp.ext.data.sd_rtd')) {
-      utils.deepSetValue(adUnit, 'ortb2Imp.ext.data.sd_rtd', [
+    if (!utils.deepAccess(adUnit, 'ortb2Imp.ext.data.qwarry_data')) {
+      utils.deepSetValue(adUnit, 'ortb2Imp.ext.data.qwarry_data', [
         data
       ]);
     }

@@ -63,7 +63,7 @@ describe('qwarryRtdProvider', function () {
         '31-07': 337
       }
       addData(adUnits, data, moduleConfig, () => {});
-      expect(adUnits[0].ortb2Imp.ext.data).to.have.deep.property('sd_rtd', [{
+      expect(adUnits[0].ortb2Imp.ext.data).to.have.deep.property('qwarry_data', [{
         'young_mid': 647,
         '28-02': 453,
         'male': 532,
@@ -73,47 +73,4 @@ describe('qwarryRtdProvider', function () {
       }]);
     });
   });
-
-  // describe('Get Segments And Categories', function () {
-  //   it('gets data from async request and adds segment data', function () {
-  //     const config = {
-  //       params: {
-  //         setGptKeyValues: false,
-  //         contextualMinRelevancyScore: 50,
-  //         bidders: [{
-  //           bidder: 'appnexus'
-  //         }, {
-  //           bidder: 'other'
-  //         }]
-  //       }
-  //     };
-
-  //     let reqBidsConfigObj = {
-  //       adUnits: [{
-  //         bids: [{
-  //           bidder: 'appnexus',
-  //           params: {
-  //             placementId: 13144370
-  //           }
-  //         }, {
-  //           bidder: 'other'
-  //         }]
-  //       }]
-  //     };
-
-  //     let data = {
-  //       segments: [111111, 222222],
-  //       contextual_categories: { '333333': 100 }
-  //     };
-
-  //     getSegmentsAndCategories(reqBidsConfigObj, () => { }, config, {});
-
-  //     let request = server.requests[0];
-  //     request.respond(200, responseHeader, JSON.stringify(data));
-
-  //     expect(reqBidsConfigObj.adUnits[0].bids[0].params.keywords).to.have.deep.property('sd_rtd', ['111111', '222222', '333333']);
-  //     expect(reqBidsConfigObj.adUnits[0].bids[1].ortb2.site.ext.data).to.have.deep.property('sd_rtd', ['333333']);
-  //     expect(reqBidsConfigObj.adUnits[0].bids[1].ortb2.user.ext.data).to.have.deep.property('sd_rtd', ['111111', '222222']);
-  //   });
-  // });
 });
