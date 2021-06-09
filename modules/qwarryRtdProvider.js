@@ -21,7 +21,7 @@ function init(moduleConfig, userConsent) {
   /* eslint-disable no-console */
 
   console.log(params);
-  console.log(userConsent);
+  // console.log(userConsent);
   // if (params && params.publisherMemberId) {
   //   // _moduleParams = Object.assign({}, DEFAULT_PARAMS, params);
   //   // initListeners();
@@ -34,7 +34,6 @@ function init(moduleConfig, userConsent) {
 function alterBidRequests(reqBidsConfigObj, callback, config, userConsent) {
   // do stuff
   // put data in AdUnit.fpd.* or rtd.RTDPROVIDERCODE.*
-
   const adUnits = reqBidsConfigObj.adUnits || getGlobal().adUnits;
 
   /* eslint-disable no-console */
@@ -126,26 +125,35 @@ function alterBidRequests(reqBidsConfigObj, callback, config, userConsent) {
     }
   });
 
+  const data = {
+    'young_mid': 647,
+    '28-02': 453,
+    'male': 532,
+    '31-10': 515,
+    '20-05': 310,
+    '31-07': 337
+  }
+
+  addData(adUnits, data, config, callback)
+
+  console.log('adunits 2 : ', adUnits);
+
+  callback();
+}
+
+export function addData(adUnits, data, moduleConfig, callback) {
   adUnits.forEach(adUnit => {
     console.log(utils.deepAccess(adUnit, 'ortb2Imp.ext.data.sd_rtd'));
     if (!utils.deepAccess(adUnit, 'ortb2Imp.ext.data.sd_rtd')) {
       utils.deepSetValue(adUnit, 'ortb2Imp.ext.data.sd_rtd', [
         // put the data here !!!!
-        {
-          'young_mid': 647,
-          '28-02': 453,
-          'male': 532,
-          '31-10': 515,
-          '20-05': 310,
-          '31-07': 337
-        }
+        data
       ]);
     }
   });
 
-  console.log('adunits 2 : ', adUnits);
-
   callback();
+  return adUnits;
 }
 
 submodule(MODULE_NAME, subModuleObj);
