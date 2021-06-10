@@ -86,13 +86,63 @@ function alterBidRequests(reqBidsConfigObj, callback, config, userConsent) {
 }
 
 export function addData(adUnits, data, moduleConfig, callback) {
+  // Google targeting
+  if (typeof window.googletag !== 'undefined' && (moduleConfig.params.setGptKeyValues || !moduleConfig.params.hasOwnProperty('setGptKeyValues'))) {
+    try {
+      window.googletag.pubads().getSlots().forEach(function(n) {
+        if (typeof n.setTargeting !== 'undefined') {
+          let newData = [];
+          Object.keys(data).forEach(key => {
+            if (data[key] >= 500) {
+              newData.push(key);
+            }
+          })
+
+          n.setTargeting('qwarry_data', newData);
+        }
+      })
+    } catch (e) { utils.logError(e); }
+  }
+
   adUnits.forEach(adUnit => {
-    if (!utils.deepAccess(adUnit, 'ortb2Imp.ext.data.qwarry_data')) {
-      utils.deepSetValue(adUnit, 'ortb2Imp.ext.data.qwarry_data', [
-        data
-      ]);
-    }
+    adUnit.hasOwnProperty('bids') && adUnit.bids.forEach(bid => {
+      try {
+        switch (bid.bidder) {
+          case 'appnexus':
+          case 'appnexusAst':
+            utils.deepSetValue(bid, 'params.keywords.qwarry_data', data);
+
+            console.log('================ augmented bid APPNEXUS =====================', bid);
+            break;
+          case 'smartadserver':
+          case 'smart':
+            var target = [];
+            if (bid.hasOwnProperty('params') && bid.params.hasOwnProperty('target')) {
+              target.push(bid.params.target);
+            }
+
+            Object.keys(data).forEach(function(key) {
+              console.log('================ index Of =====================', target.indexOf(key + '=' + data[key]) === -1);
+              if (target.indexOf(key + '=' + data[key]) === -1) {
+                target.push(key + '=' + data[key]);
+              }
+            });
+
+            utils.deepSetValue(bid, 'params.target', target.join(';'));
+            console.log('================ augmented bid SMART =====================', bid);
+            break;
+          default:
+            if (!utils.deepAccess(adUnit, 'ortb2Imp.ext.data.qwarry_data')) {
+              utils.deepSetValue(adUnit, 'ortb2Imp.ext.data.qwarry_data', [
+                data
+              ]);
+            }
+        }
+      } catch (e) { utils.logError(e) }
+    });
   });
+
+  console.log('================ augmented adunits =====================', adUnits);
 
   callback();
   return adUnits;
