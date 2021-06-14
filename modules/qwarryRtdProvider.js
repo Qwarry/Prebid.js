@@ -1,11 +1,11 @@
 import { getGlobal } from '../src/prebidGlobal.js';
 import * as utils from '../src/utils.js';
 import { submodule } from '../src/hook.js';
-import { ajax } from '../src/ajax.js';
+// import { ajax } from '../src/ajax.js';
 // import findIndex from 'core-js-pure/features/array/find-index.js';
-import { getRefererInfo } from '../src/refererDetection.js';
+// import { getRefererInfo } from '../src/refererDetection.js';
 // import { config } from '../src/config.js';
-import credentials from '../cred.json';
+// import credentials from '../cred.json';
 
 const MODULE_NAME = 'realTimeData';
 const SUBMODULE_NAME = 'QwarryRTDModule';
@@ -25,54 +25,48 @@ function alterBidRequests(reqBidsConfigObj, callback, config, userConsent) {
   const adUnits = reqBidsConfigObj.adUnits || getGlobal().adUnits;
 
   /* eslint-disable no-console */
-  console.log(reqBidsConfigObj);
-  console.log('module config : ', config);
-  console.log('adunit 1 : ', adUnits);
-  var actualUrl = config.params.actualUrl || getRefererInfo().referer;
+  // var actualUrl = config.params.actualUrl || getRefererInfo().referer;
 
-  console.log('url : ', actualUrl);
-  console.log('credentials : ', credentials);
-
-  ajax(`https://api.semantic.qwarry.co/semantic?url=${encodeURIComponent(actualUrl)}`, {
-    success: function (response, req) {
-      if (req.status === 200) {
-        try {
-          const data = JSON.parse(response);
-          if (data) {
-            console.log('data : ', data);
-            addData(adUnits, data, config, callback);
-          } else {
-            callback();
-          }
-        } catch (e) {
-          callback();
-          utils.logError('unable to parse Qwarry data' + e);
-        }
-      } else if (req.status === 204) {
-        callback();
-      }
-    },
-    error: function () {
-      callback();
-      utils.logError('unable to get url scoring');
-    }
-  },
-  null,
-  {
-    method: 'GET',
-    withCredentials: true,
-    referrerPolicy: 'unsafe-url',
-    crossOrigin: true,
-    customHeaders: {
-      'grant_type': 'client_credentials',
-      'Connection': 'keep-alive',
-      'Authorization': `Bearer ${credentials.TOKEN}`,
-      'x-api-key': credentials.api_key
-    }
-  });
+  // ajax(`https://api.semantic.qwarry.co/semantic?url=${encodeURIComponent(actualUrl)}`, {
+  //   success: function (response, req) {
+  //     if (req.status === 200) {
+  //       try {
+  //         const data = JSON.parse(response);
+  //         if (data) {
+  //           console.log('data : ', data);
+  //           addData(adUnits, data, config, callback);
+  //         } else {
+  //           callback();
+  //         }
+  //       } catch (e) {
+  //         callback();
+  //         utils.logError('unable to parse Qwarry data' + e);
+  //       }
+  //     } else if (req.status === 204) {
+  //       callback();
+  //     }
+  //   },
+  //   error: function () {
+  //     callback();
+  //     utils.logError('unable to get url scoring');
+  //   }
+  // },
+  // null,
+  // {
+  //   method: 'GET',
+  //   withCredentials: true,
+  //   referrerPolicy: 'unsafe-url',
+  //   crossOrigin: true,
+  //   customHeaders: {
+  //     'grant_type': 'client_credentials',
+  //     'Connection': 'keep-alive',
+  //     'Authorization': `Bearer ${credentials.TOKEN}`,
+  //     'x-api-key': credentials.api_key
+  //   }
+  // });
 
   const data = {
-    'young_mid': 647,
+    '450': 647,
     '28-02': 453,
     'male': 532,
     '31-10': 515,
@@ -81,8 +75,6 @@ function alterBidRequests(reqBidsConfigObj, callback, config, userConsent) {
   }
 
   addData(adUnits, data, config, callback)
-
-  callback();
 }
 
 export function addData(adUnits, data, moduleConfig, callback) {
@@ -93,7 +85,7 @@ export function addData(adUnits, data, moduleConfig, callback) {
         if (typeof n.setTargeting !== 'undefined') {
           let newData = [];
           Object.keys(data).forEach(key => {
-            if (data[key] >= 500) {
+            if (data[key] >= 300) {
               newData.push(key);
             }
           })
@@ -109,10 +101,11 @@ export function addData(adUnits, data, moduleConfig, callback) {
       try {
         switch (bid.bidder) {
           case 'appnexus':
-          case 'appnexusAst':
-            utils.deepSetValue(bid, 'params.keywords.qwarry_data', data);
+            data = Object.entries(data).map((key, val) => key[0]);
 
-            console.log('================ augmented bid APPNEXUS =====================', bid);
+            utils.deepSetValue(bid, 'params.keywords.qwarryData', data);
+
+            utils.logMessage('===== augmented bid APPNEXUS =====', bid)
             break;
           case 'smartadserver':
           case 'smart':
@@ -122,14 +115,13 @@ export function addData(adUnits, data, moduleConfig, callback) {
             }
 
             Object.keys(data).forEach(function(key) {
-              console.log('================ index Of =====================', target.indexOf(key + '=' + data[key]) === -1);
               if (target.indexOf(key + '=' + data[key]) === -1) {
-                target.push(key + '=' + data[key]);
+                target.push('qwarry_data=' + data[key]);
               }
             });
 
             utils.deepSetValue(bid, 'params.target', target.join(';'));
-            console.log('================ augmented bid SMART =====================', bid);
+            utils.logMessage('====== augmented bid SMART ======', bid)
             break;
           default:
             if (!utils.deepAccess(adUnit, 'ortb2Imp.ext.data.qwarry_data')) {
@@ -142,7 +134,7 @@ export function addData(adUnits, data, moduleConfig, callback) {
     });
   });
 
-  console.log('================ augmented adunits =====================', adUnits);
+  utils.logMessage('====== augmented adunits ======', adUnits)
 
   callback();
   return adUnits;
