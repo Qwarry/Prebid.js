@@ -77,7 +77,27 @@ function alterBidRequests(reqBidsConfigObj, callback, config, userConsent) {
   addData(adUnits, data, config, callback)
 }
 
+export function setgobalOrtb2(data) {
+  try {
+    let addOrtb2 = {};
+    let testGlobal = getGlobal().getConfig('ortb2') || {};
+    utils.logMessage('======  ortb2 ======', getGlobal().getConfig('ortb2'))
+    if (!utils.deepAccess(testGlobal, 'user.ext.data.qwarry_data') || !utils.deepEqual(testGlobal.user.ext.data.qwarry_data, data)) {
+      utils.deepSetValue(addOrtb2, 'user.ext.data.qwarry_data', data || {});
+    }
+    if (!utils.isEmpty(addOrtb2)) {
+      let ortb2 = {ortb2: utils.mergeDeep({}, testGlobal, addOrtb2)};
+      getGlobal().setConfig(ortb2);
+    }
+  } catch (e) {
+    utils.logError(e)
+  }
+
+  return true;
+};
+
 export function addData(adUnits, data, moduleConfig, callback) {
+  setgobalOrtb2(data)
   // Google targeting
   if (typeof window.googletag !== 'undefined' && (moduleConfig.params.setGptKeyValues || !moduleConfig.params.hasOwnProperty('setGptKeyValues'))) {
     try {
@@ -136,6 +156,7 @@ export function addData(adUnits, data, moduleConfig, callback) {
 
   utils.logMessage('====== augmented adunits ======', adUnits)
 
+  utils.logMessage('====== augmented ortb2 ======', getGlobal().getConfig('ortb2'))
   callback();
   return adUnits;
 }
