@@ -93,6 +93,8 @@ export function setgobalOrtb2(data) {
     utils.logError(e)
   }
 
+  utils.logMessage('====== augmented ortb2 ======', getGlobal().getConfig('ortb2'))
+
   return true;
 };
 
@@ -156,7 +158,6 @@ export function addData(adUnits, data, moduleConfig, callback) {
 
   utils.logMessage('====== augmented adunits ======', adUnits)
 
-  utils.logMessage('====== augmented ortb2 ======', getGlobal().getConfig('ortb2'))
   callback();
   return adUnits;
 }
