@@ -160,5 +160,6 @@ describe('qwarryRtdProvider', function () {
       setgobalOrtb2(data);
 
       should.exist(getGlobal().getConfig('ortb2'));
+    });
   });
 });
